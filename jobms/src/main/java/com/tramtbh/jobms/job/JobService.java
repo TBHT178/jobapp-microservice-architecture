@@ -4,6 +4,8 @@
  */
 package com.tramtbh.jobms.job;
 
+import com.tramtbh.jobms.job.dto.JobWithCompanyDTO;
+
 import java.util.List;
 
 /**
@@ -11,7 +13,7 @@ import java.util.List;
  * @author DELL
  */
 public interface JobService {
-    List<Job> findAll();
+    List<JobWithCompanyDTO> findAll();
     void createJob(Job job);
     Job getJobById(Long id);
     boolean deleteJobById(Long id);
