@@ -5,6 +5,8 @@
 package com.tramtbh.jobms.job.impl;
 
 
+import com.tramtbh.jobms.job.clients.CompanyClient;
+import com.tramtbh.jobms.job.clients.ReviewClient;
 import com.tramtbh.jobms.job.Job;
 import com.tramtbh.jobms.job.JobRepository;
 import com.tramtbh.jobms.job.JobService;
@@ -13,11 +15,7 @@ import com.tramtbh.jobms.job.external.Company;
 import com.tramtbh.jobms.job.external.Review;
 import com.tramtbh.jobms.job.mapper.JobMapper;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +28,14 @@ import java.util.stream.Collectors;
  */
 @Service
 public class JobServiceImpl implements JobService {
+
     @Autowired
-    RestTemplate restTemplate;
+    private CompanyClient companyClient;
+
+    @Autowired
+    private ReviewClient reviewClient;
 
     private final JobRepository jobRepository;
-
     public JobServiceImpl(JobRepository jobRepository) {
         this.jobRepository = jobRepository;
     }
@@ -48,22 +49,10 @@ public class JobServiceImpl implements JobService {
     }
 
     private JobDTO convertToDto(Job job) {
-
-//        RestTemplate restTemplate = new RestTemplate();
-        Company company = restTemplate.getForObject("http://companyms:8082/companies/" + job.getCompanyId(), Company.class);
-
-        // Exchange method is much more versatile than getForObject, useful when the response type is a generic collection
-        ResponseEntity<List<Review>> reviewResponse = restTemplate.exchange("http://reviewms:8083/reviews?companyId=" + job.getCompanyId(),
-                HttpMethod.GET,
-                null,
-                new ParameterizedTypeReference<List<Review>>() {
-        });
-
-        List<Review> reviews = reviewResponse.getBody();
+        Company company = companyClient.getCompany(job.getId());
+        List<Review> reviews = reviewClient.getReviews(job.getCompanyId());
 
         JobDTO jobDTO = JobMapper.mapToJobWithCompanyDTO(job, company, reviews);
-//        jobDTO.setCompany(company);
-
         return jobDTO;
     }
 
