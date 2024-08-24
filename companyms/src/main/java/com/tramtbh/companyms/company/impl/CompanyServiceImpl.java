@@ -8,6 +8,9 @@ package com.tramtbh.companyms.company.impl;
 import com.tramtbh.companyms.company.Company;
 import com.tramtbh.companyms.company.CompanyRepository;
 import com.tramtbh.companyms.company.CompanyService;
+import com.tramtbh.companyms.company.clients.ReviewClient;
+import com.tramtbh.companyms.company.dto.ReviewMessage;
+import jakarta.ws.rs.NotFoundException;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -21,8 +24,11 @@ import java.util.Optional;
 public class CompanyServiceImpl implements CompanyService {
     private final CompanyRepository companyRepository;
 
-    public CompanyServiceImpl(CompanyRepository companyRepository) {
+    private ReviewClient reviewClient;
+
+    public CompanyServiceImpl(CompanyRepository companyRepository, ReviewClient reviewClient) {
         this.companyRepository = companyRepository;
+        this.reviewClient = reviewClient;
     }
     
     @Override
@@ -64,5 +70,13 @@ public class CompanyServiceImpl implements CompanyService {
         return false;
     }
 
-    
+    @Override
+    public void updateCompanyRating(ReviewMessage reviewMessage) {
+        Company company = companyRepository.findById(reviewMessage.getCompanyId()).orElseThrow(() -> new NotFoundException("Company not found"));
+        double averageRating = reviewClient.getAverageRatingForCompany(reviewMessage.getCompanyId());
+        company.setRating(averageRating);
+        companyRepository.save(company);
+    }
+
+
 }

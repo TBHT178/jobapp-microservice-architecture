@@ -3,6 +3,8 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Interface.java to edit this template
  */
 package com.tramtbh.companyms.company;
+import com.tramtbh.companyms.company.dto.ReviewMessage;
+
 import java.util.List;
 
 
@@ -12,4 +14,5 @@ public interface CompanyService {
     Company getCompanyById(Long id);
     boolean deleteCompanyById(Long id);
     boolean updateCompany(Long id, Company updatedCompany);
+    void updateCompanyRating(ReviewMessage reviewMessage);
 }
