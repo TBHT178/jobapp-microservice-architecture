@@ -4,6 +4,7 @@
  */
 package com.tramtbh.reviewms.review;
 
+import com.tramtbh.reviewms.review.messaging.ReviewMessageProducer;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,8 +21,11 @@ public class ReviewController {
 
     private ReviewService reviewService;
 
-    public ReviewController(ReviewService reviewService) {
+    private ReviewMessageProducer reviewMessageProducer;
+
+    public ReviewController(ReviewService reviewService, ReviewMessageProducer reviewMessageProducer) {
         this.reviewService = reviewService;
+        this.reviewMessageProducer = reviewMessageProducer;
     }
 
     @GetMapping
@@ -33,6 +37,7 @@ public class ReviewController {
     public ResponseEntity<String> addReview(@RequestParam Long companyId, @RequestBody Review review) {
         Boolean isReviewSaved = reviewService.addReview(companyId, review);
         if (isReviewSaved) {
+            reviewMessageProducer.sendMessage(review);
             return new ResponseEntity<>("Review Added!", HttpStatus.CREATED);
         } else {
             return new ResponseEntity<>("Can not add review!", HttpStatus.NOT_FOUND);
@@ -62,5 +67,11 @@ public class ReviewController {
         } else {
             return new ResponseEntity<>("Can not delete review!", HttpStatus.NOT_FOUND);
         }
+    }
+
+    @GetMapping("/averageRating")
+    public Double getAverageRating(@RequestParam Long companyId) {
+        List<Review> reviewList = reviewService.getAllReviews(companyId);
+        return reviewList.stream().mapToDouble(Review::getRating).average().orElse(0.0);
     }
 }
