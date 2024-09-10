@@ -33,14 +33,14 @@ services:
     image: tbht/config-server-ms:latest
     container_name: config-server-ms
     ports:
-      - 8080:8080
+      - "8080:8080"
     depends_on:
       - servicereg
     networks:
       - microservice-network
       - postgres
     environment:
-      - SPRING_PROFILE_ACTIVE: docker
+      - SPRING_PROFILE_ACTIVE=docker
 
   servicereg:
     image: tbht/servicereg:latest
@@ -59,7 +59,7 @@ services:
   gateway-ms:
     image: tbht/gateway-ms:latest
     ports:
-      - 8084:8084
+      - "8084:8084"
     depends_on:
       - servicereg
     networks:
@@ -72,7 +72,7 @@ services:
     image: tbht/companyms:latest
     container_name: company
     ports:
-      - 8082:8082
+      - "8082:8082"
     depends_on:
       - servicereg
       - config-server-ms
@@ -86,7 +86,7 @@ services:
     image: tbht/jobms:latest
     container_name: job
     ports:
-      - 8081:8081
+      - "8081:8081"
     depends_on:
       - servicereg
       - config-server-ms
@@ -101,7 +101,7 @@ services:
     image: tbht/reviewms:latest
     container_name: review
     ports:
-      - 8083:8083
+      - "8083:8083"
     depends_on:
       - servicereg
       - config-server-ms
@@ -115,7 +115,7 @@ services:
     image: openzipkin/zipkin
     container_name: zipkin
     ports:
-      - 9411:9411
+      - "9411:9411"
     networks:
       - postgres
 
